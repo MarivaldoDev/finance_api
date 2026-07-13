@@ -1,20 +1,28 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from datetime import date
 
 
 class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
     image_profile = models.ImageField(upload_to='profile_images/', null=True, blank=True)
+    username = models.CharField(max_length=150, unique=False, null=True, blank=True)
+    email = models.EmailField(unique=True)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     def __str__(self) -> str:
         return self.get_full_name()
-    
-    @property
-    def calculate_age(self) -> bool | None:
-        pass
-    
-    
+
+    def save(self, *args, **kwargs) -> None:
+        if not self.username:
+            self.username = "user_" + self.email
+        
+        self.set_password(self.password)
+
+        super().save(*args, **kwargs)
+
+
 class Account(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="accounts")
     name = models.CharField(max_length=100)
