@@ -5,22 +5,10 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
     image_profile = models.ImageField(upload_to='profile_images/', null=True, blank=True)
-    username = models.CharField(max_length=150, unique=False, null=True, blank=True)
     email = models.EmailField(unique=True)
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name"]
-
     def __str__(self) -> str:
-        return self.get_full_name()
-
-    def save(self, *args, **kwargs) -> None:
-        if not self.username:
-            self.username = "user_" + self.email
-        
-        self.set_password(self.password)
-
-        super().save(*args, **kwargs)
+        return self.username
 
 
 class Account(models.Model):
